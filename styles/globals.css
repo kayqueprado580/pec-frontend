@@ -1,9 +1,18 @@
+/* styles/globals.css */
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+@import 'typeface-vt323'; /* VT323 */
+@import 'typeface-roboto-mono'; /* Roboto Mono */
+@import 'typeface-open-sans'; /* Open Sans */
+
 html,
 body {
   padding: 0;
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif, Roboto Mono, Open Sans, VT323;
 }
 
 a {
