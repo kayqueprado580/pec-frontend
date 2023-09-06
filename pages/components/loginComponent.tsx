@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import Loading from './loadingComponent';
 import Alert from './messageAlertComponent';
+import { useAuth } from '../contexts/authContext';
 
 interface LoginResponse {
   access_token: string;
@@ -16,6 +17,7 @@ const Login: React.FC = () => {
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const router = useRouter();
+  const { setToken } = useAuth();
 
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -28,9 +30,10 @@ const Login: React.FC = () => {
         password,
       });
       if (response.data.access_token) {
-        console.log('Token JWT:', response.data.access_token);
         sessionStorage.setItem('accessToken', response.data.access_token);
+        setToken(response.data.access_token);
         console.log('Login Sucess');
+        console.log('Token JWT:', response.data.access_token);
         router.push('/loged/categories');
       } else {
         console.log('response:', response.data);

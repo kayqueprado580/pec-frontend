@@ -90,3 +90,17 @@ export const createCategory = async (token: string | null, name: string, descrip
 		throw error;
 	}
 };
+
+export const validToken = async (token: string | null) => {
+	const response = await axios.get(`${apiUrl}/v1/categories/`, {
+		headers: {
+			Authorization: `Bearer ${token}`,
+		},
+	});
+
+	if (response.status == 401) {
+		return false
+	} else { 
+		return true
+	}
+};

@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import '../styles/globals.css'
 import '@fortawesome/fontawesome-free/css/all.min.css'
+import { AuthProvider } from './contexts/authContext'; // Importe o AuthProvider
 
 function MyApp({ Component, pageProps }: AppProps) {
 
@@ -11,7 +12,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   useEffect(() => {
     document.title = 'P.E Control';
 
-    const handleRouteChange = (url : any) => {
+    const handleRouteChange = (url: any) => {
       document.title = 'P.E Control';
     };
     router.events.on('routeChangeComplete', handleRouteChange);
@@ -21,7 +22,11 @@ function MyApp({ Component, pageProps }: AppProps) {
     };
   }, []);
 
-  return <Component {...pageProps} />
+  return (
+    <AuthProvider>
+      <Component {...pageProps} />
+    </AuthProvider >
+  )
 }
 
 export default MyApp

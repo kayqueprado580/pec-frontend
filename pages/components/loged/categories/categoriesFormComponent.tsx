@@ -112,6 +112,7 @@ const CategoryForm: React.FC<FormProps> = ({
 
 	const handleCloseModal = () => {
 		onCloseModal();
+		isModalOpen = false;
 	};
 
 	const handleKeyDown = (event: React.KeyboardEvent) => {
