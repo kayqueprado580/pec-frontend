@@ -10,10 +10,10 @@ function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter();
 
   useEffect(() => {
-    document.title = 'P.E Control';
+    document.title = 'Personal Economy Control';
 
     const handleRouteChange = (url: any) => {
-      document.title = 'P.E Control';
+      document.title = 'Personal Economy Control';
     };
     router.events.on('routeChangeComplete', handleRouteChange);
 

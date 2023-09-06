@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { createCategory, editCategory, getCategory } from '../../../api/categories';
+import { createCategory, editCategory, getCategory, validToken } from '../../../api/categories';
 import Loading from '../../../components/loadingComponent';
-import Alert from '../../../components/messageAlertComponent';
+import { useAuth } from '../../../contexts/authContext';
+import { isValidString } from '../../../services/inputs.validator';
 
 
 interface FormProps {
@@ -10,8 +11,8 @@ interface FormProps {
 	selectedId?: number | null;
 	onCloseModal: () => void;
 	isModalOpen: boolean;
-	// alert: (message: string, haveError: boolean) => void;
-	// reloadData: () => void;
+	onMessage: (haveError: boolean | null, message: string | null) => void;
+	sessionValid: () => void;
 }
 
 const CategoryForm: React.FC<FormProps> = ({
@@ -19,50 +20,45 @@ const CategoryForm: React.FC<FormProps> = ({
 	selectedId,
 	onCloseModal,
 	isModalOpen,
-	// alert,
-	// reloadData
+	onMessage,
+	sessionValid
 }) => {
 	const router = useRouter();
+	const { token } = useAuth();
 	const [name, setName] = useState('');
 	const [description, setDescription] = useState('');
-	const [isAuthenticated, setIsAuthenticated] = useState(false);
 	const modalTitle = isEditing ? 'Editar' : 'Novo';
 	const buttonTitle = isEditing ? 'Editar' : 'Criar';
 	const [isLoading, setIsLoading] = useState(false);
-	const [message, setMessage] = useState('');
-	const [haveError, setHaveError] = useState(false);
-
-	const validToken = async () => {
-		if (!sessionStorage.getItem('accessToken')) {
-			console.log('redirect');
-			router.push('/');
-		} else {
-			setIsAuthenticated(true);
-		}
-	};
-
-	// const sessionExpired = () => {
-	// 	setHaveError(true)
-	// 	setMessage(`Sessão expirada, você será redirecionado`)
-	// 	setIsAuthenticated(false)
-	// 	setTimeout(() => {
-	// 		setMessage('')
-	// 	}, 1500);
-	// 	console.log('redirect')
-	// 	router.push('/')
-	// 	return;
-	// }
+	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [nameError, setNameError] = useState('');
 
 	useEffect(() => {
 
+		const handleEscapeKey = (event: KeyboardEvent) => {
+			if (event.key === 'Escape') {
+				onCloseModal();
+			}
+		};
+
+		const handleClickOutside = (event: MouseEvent) => {
+			const modal = document.querySelector('.modal');
+			if (modal && !modal.contains(event.target as Node)) {
+				onCloseModal();
+			}
+		};
+
+		if (isModalOpen) {
+			document.addEventListener('keydown', handleEscapeKey);
+			document.addEventListener('mousedown', handleClickOutside);
+		}
+
 		if (isEditing && selectedId) {
 			const fetchCategory = async () => {
-				await validToken();
+				setIsLoading(true);
+				const isValid = await validToken(token);
 
-				if (isAuthenticated) {
-					const token = sessionStorage.getItem('accessToken');
-					setIsLoading(true);
-
+				if (isValid) {
 					try {
 						const data = await getCategory(selectedId, token);
 						const { name, description } = data;
@@ -73,19 +69,37 @@ const CategoryForm: React.FC<FormProps> = ({
 					} finally {
 						setIsLoading(false);
 					}
+				} else {
+					setIsLoading(false);
+					sessionValid()
 				}
 			};
 
 			fetchCategory();
 		}
-	}, [router, isEditing, selectedId, isAuthenticated]);
+
+		return () => {
+			document.addEventListener('keydown', handleEscapeKey);
+			document.addEventListener('mousedown', handleClickOutside);
+		};
+
+	}, [router, isEditing, selectedId]);
 
 	const handleSubmit = async (event: React.FormEvent) => {
 		event.preventDefault();
-		await validToken();
+		setIsSubmitting(true);
 
-		if (isAuthenticated) {
-			const token = sessionStorage.getItem('accessToken');
+		const isValid = await validToken(token);
+
+		if (isValid) {
+			if (isValidString(name)) {
+				setNameError('');
+			}
+			if (!isValidString(name)) {
+				setNameError('Campo Obrigatório.');
+				setIsSubmitting(false);
+				return;
+			}
 
 			try {
 				if (isEditing && selectedId) {
@@ -93,26 +107,23 @@ const CategoryForm: React.FC<FormProps> = ({
 				} else {
 					await createCategory(token, name, description);
 				}
-				setHaveError(false)
-				setMessage(`Sucesso`)
+				onMessage(false, 'ação realizada com sucesso');
 			} catch (error) {
 				console.error(error);
-				setHaveError(false)
-				setMessage(`error: ${error}`)
+				onMessage(true, `Erro: ${error}`);
 			} finally {
 				setIsLoading(false);
 				onCloseModal();
+				setIsSubmitting(false);
 			}
+		} else {
+			sessionValid()
 		}
 	};
 
-	if (!isModalOpen) {
-		return null;
-	}
-
 	const handleCloseModal = () => {
-		onCloseModal();
 		isModalOpen = false;
+		onCloseModal();
 	};
 
 	const handleKeyDown = (event: React.KeyboardEvent) => {
@@ -121,52 +132,65 @@ const CategoryForm: React.FC<FormProps> = ({
 		}
 	};
 
+	if (!isModalOpen) {
+		return null;
+	}
+
 	return (
 		isModalOpen && (
-			<div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
-				<div className="bg-white dark:bg-gray-800 rounded-lg p-8 shadow-md max-w-md modal" tabIndex={-1}>
-					<button className="text-gray-500 hover:text-gray-600" onKeyDown={handleKeyDown} onClick={handleCloseModal}>
-						X
-					</button>
-					<h2 className="text-2xl font-bold mb-4 text-center">{modalTitle}</h2>
-					<form onSubmit={handleSubmit}>
-						<div className="mb-4">
-							<label htmlFor="name" className="block mb-2 font-medium text-gray-900">
-								Nome:
-							</label>
-							<input
-								type="text"
-								id="name"
-								value={name}
-								onChange={(e) => setName(e.target.value)}
-								className="w-full border border-gray-300 rounded-md px-3 py-2"
-							/>
-						</div>
-						<div className="mb-4">
-							<label htmlFor="description" className="block mb-2 font-medium text-gray-900">
-								Descrição:
-							</label>
-							<input
-								type="text"
-								id="description"
-								value={description}
-								onChange={(e) => setDescription(e.target.value)}
-								className="w-full border border-gray-300 rounded-md px-3 py-2"
-							/>
-						</div>
-
-						<div className="text-center">
-							<button
-								type="submit"
-								className="px-4 py-2 bg-default-green text-white rounded-md hover:bg-default-green-2"
-							>
-								{buttonTitle}
+			<>
+				{isLoading ? (
+					<Loading />
+				) : (
+					<div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
+						<div className="bg-white dark:bg-gray-800 rounded-lg p-8 shadow-md max-w-md modal">
+							<button className="text-gray-500 hover:text-gray-600" onKeyDown={handleKeyDown} onClick={handleCloseModal}>
+								X
 							</button>
+							<>
+								<h2 className="text-2xl font-bold mb-4 text-center">{modalTitle}</h2>
+								<form onSubmit={handleSubmit}>
+									<div className="mb-4">
+										<label htmlFor="name" className="block mb-2 font-medium text-gray-900">
+											Nome:
+										</label>
+										<input
+											type="text"
+											id="name"
+											value={name}
+											onChange={(e) => setName(e.target.value)}
+											className="w-full border border-gray-300 rounded-md px-3 py-2"
+										/>
+										{nameError && <p className="text-red-500">{nameError}</p>}
+									</div>
+									<div className="mb-4">
+										<label htmlFor="description" className="block mb-2 font-medium text-gray-900">
+											Descrição:
+										</label>
+										<input
+											type="text"
+											id="description"
+											value={description}
+											onChange={(e) => setDescription(e.target.value)}
+											className="w-full border border-gray-300 rounded-md px-3 py-2"
+										/>
+									</div>
+
+									<div className="text-center">
+										<button
+											type="submit"
+											className="px-4 py-2 bg-default-green text-white rounded-md hover:bg-default-green-2"
+											disabled={isSubmitting}
+										>
+											{buttonTitle}
+										</button>
+									</div>
+								</form>
+							</>
 						</div>
-					</form>
-				</div>
-				<Alert isOpen={!!message} onClose={() => setMessage('')} message={message} isMessageError={haveError} />
-			</div>
+					</div>
+				)}
+			</>
 		)
 	);
 };

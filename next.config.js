@@ -3,7 +3,7 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   env: {
-    SITE_TITLE: 'P.E Control',
+    SITE_TITLE: 'Personal Economy Control',
     API_URL: 'http://localhost:3333',
     // API_URL: 'https://backend-portfolio-v3-production.up.railway.app',
   },

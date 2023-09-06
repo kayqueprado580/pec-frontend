@@ -9,11 +9,6 @@ import Alert from '../components/messageAlertComponent';
 import CategoryForm from '../components/loged/categories/categoriesFormComponent';
 import { useAuth } from '../contexts/authContext';
 
-//TO DO
-// Categories Form Component (Edit/New)
-// - Modal
-
-
 const CategoriesPage: React.FC = () => {
 	const router = useRouter();
 	const { token } = useAuth();
@@ -48,7 +43,7 @@ const CategoriesPage: React.FC = () => {
 				const data = await getCategories(token)
 				setCategories(data);
 				setShowCategoriesList(true);
-			} catch (error) {
+			} catch (error: any) {
 				console.error(error);
 				if (error.status == 401) {
 					sessionExpired();
@@ -66,8 +61,6 @@ const CategoriesPage: React.FC = () => {
 		else {
 			sessionExpired();
 		}
-
-
 
 	};
 
@@ -97,7 +90,7 @@ const CategoriesPage: React.FC = () => {
 				setCategories((prevCategories) => prevCategories.filter((category) => category.id !== id));
 				setTimeout(() => {
 					setMessage('');
-				}, 900);
+				}, 1500);
 			})
 			.catch((error) => {
 				console.error(error);
@@ -119,6 +112,7 @@ const CategoriesPage: React.FC = () => {
 	};
 
 	const handleOpenModal = () => {
+		setSelectedCategoryId(null)
 		setShowCategoriesList(false);
 		setIsModalOpen(true);
 	};
@@ -129,10 +123,17 @@ const CategoriesPage: React.FC = () => {
 		fetchCategories();
 	};
 
-	// const handleMessageForm = (message: string, haveError: boolean) => {
-	// 	setHaveError(haveError);
-	// 	setMessage(`Error: ${message}`)
-	// };
+	const handleSessionExpired = () => {
+		sessionExpired()
+	};
+
+	const handleMessageAlert = (haveError: boolean, message: string | null) => {
+		setHaveError(haveError);
+		setMessage(`${message}`)
+		setTimeout(() => {
+			setMessage('');
+		}, 1500);
+	};
 
 	const handleReloadData = () => {
 		setShouldReloadData(true);
@@ -160,10 +161,12 @@ const CategoriesPage: React.FC = () => {
 							) : (
 								<CategoryForm
 									isModalOpen={isModalOpen}
-									onCloseModal={() => handleCloseModal()}
+									onCloseModal={handleCloseModal}
 									key={modalKey}
 									selectedId={selectedCategoryId}
 									isEditing={!!selectedCategoryId}
+									onMessage={handleMessageAlert}
+									sessionValid={handleSessionExpired}
 								/>
 							)}
 						</>
