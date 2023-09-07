@@ -39,13 +39,15 @@ export const editUser = async (id: number, token: string | null, name: string, d
 	}
 };
 
-export const createUser = async (token: string | null, name: string, description: string) => {
+export const createUser = async (token: string | null, name: string, email: string, username: string, password: string) => {
 	try {
 		const response = await axios.post(
 			`${apiUrl}/v1/users`,
 			{
 				name,
-				description
+				email,
+				username,
+				password
 			},
 			{
 				headers: {

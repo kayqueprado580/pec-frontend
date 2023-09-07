@@ -3,7 +3,6 @@ import axios from 'axios';
 const apiUrl = process.env.API_URL;
 
 export const getDataDashboard = async (
-	id: number,
 	token: string | null,
 	startDate?: string | null,
 	endDate?: string | null,
