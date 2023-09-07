@@ -8,15 +8,15 @@ export const getDataDashboard = async (
 	endDate?: string | null,
 ) => {
 
-	let endpoint = `${apiUrl}/v1/dashboard`
+	let endpoint = `${apiUrl}/v1/dashboard?`
 	if (startDate && startDate != '')
-		endpoint += `&startDate=${startDate}`
+		endpoint += `startDate=${startDate}`
 
 	if (endDate && endDate != '')
 		endpoint += `&endDate=${endDate}`
 
 	try {
-		const response = await axios.get(`${apiUrl}/v1/dashboard`, {
+		const response = await axios.get(`${endpoint}`, {
 			headers: {
 				Authorization: `Bearer ${token}`,
 			},

@@ -101,8 +101,8 @@ const DateFilter: React.FC<{
 	}, []);
 
 	return (
-		<div className="flex justify-between mt-2">
-			<div className="relative inline-block">
+		<div className="flex justify-between mt-6">
+			<div className="relative inline-block ml-2">
 				<label className="ml-2 mr-2 text-lg font-medium text-gray-600 dark:text-white">Início:</label>
 				<select
 					value={selectedMonthStart}
@@ -153,7 +153,7 @@ const DateFilter: React.FC<{
 				</select>
 			</div>
 			<button
-				className="bg-default-green text-white rounded-md hover:bg-default-green-2 px-4 py-2"
+				className="mr-5 bg-default-green text-white rounded-md hover:bg-default-green-2 px-4 py-2"
 				onClick={handleFilterClick}
 			>
 				Filtrar
