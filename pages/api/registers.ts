@@ -1,4 +1,6 @@
 import axios from 'axios';
+import { customError } from '../../interfaces/customError.interface';
+import { handleApiRequest } from '../../utils/apiUtils';
 
 const apiUrl = process.env.API_URL;
 
@@ -17,29 +19,48 @@ export const getRegister = async (id: number, token: string | null) => {
 	}
 };
 
-export const getRegisters = async (token: string | null, startDate?: string | null, endDate?: string | null) => {
-	console.log('getRegisters')
+export const getRegisters = async (
+	token: string | null,
+	startDate?: string | null,
+	endDate?: string | null,
+	name?: string | null,
+	type?: string | null,
+	categoryId?: number | null,
+) => {
+
+	let endpoint = `${apiUrl}/v1/registers?take=999999`
+	if (startDate && startDate != '')
+		endpoint += `&startDate=${startDate}`
+
+	if (endDate && endDate != '')
+		endpoint += `&endDate=${endDate}`
+
+	if (categoryId && categoryId != 0)
+		endpoint += `&category=${categoryId}`
+
+	if (name && name != '')
+		endpoint += `&name=${name}`
+
+	if (type && type != '')
+		endpoint += `&type=${type}`
+
 	try {
-		let endpoint = `${apiUrl}/v1/registers?take=999999`
-		if (startDate && startDate != '')
-			endpoint += `&startDate=${startDate}`
+		const data = await handleApiRequest(async () => {
+			const response = await axios.get(`${endpoint}`, {
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			});
 
-		if (endDate && startDate != '')
-			endpoint += `&endDate=${endDate}`
-
-		console.log(`endpoint: ${endpoint}`)
-		const response = await axios.get(`${endpoint}`, {
-			headers: {
-				Authorization: `Bearer ${token}`,
-			},
+			return response.data;
 		});
-		console.log(`response.data: ${response.data}`)
 
-		return response.data;
+		return data
 	} catch (error) {
-		console.error('Erro ao obter os dados:', error);
-		throw error;
+		console.error('error', error);
 	}
+
+
 };
 
 export const deleteRegister = async (id: number, token: string | null) => {
@@ -63,7 +84,7 @@ export const editRegister = async (
 	name: string,
 	type: string,
 	value: string,
-	date: Date,
+	date: string,
 	pago: boolean,
 	categoryId: number,
 	description: string
@@ -101,7 +122,7 @@ export const createRegister = async (
 	name: string,
 	type: string,
 	value: string,
-	date: Date,
+	date: string,
 	pago: boolean,
 	categoryId: number,
 	description: string

@@ -132,10 +132,6 @@ const CategoryForm: React.FC<FormProps> = ({
 		}
 	};
 
-	if (!isModalOpen) {
-		return null;
-	}
-
 	return (
 		isModalOpen && (
 			<>

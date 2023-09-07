@@ -7,11 +7,15 @@ import { getRegisters, deleteRegister, validToken } from '../api/registers';
 import Alert from '../components/messageAlertComponent';
 import { useAuth } from '../contexts/authContext';
 import RegistersList from '../components/loged/registers/registersListComponent';
+import { getCategories } from '../api/categories';
+import { Category } from '../../interfaces/category.interface';
+import RegisterForm from '../components/loged/registers/registersFormComponent';
 
 const RegistersPage: React.FC = () => {
 	const router = useRouter();
 	const { token } = useAuth();
 	const [registers, setRegisters] = useState<Register[]>([]);
+	const [categories, setCategories] = useState<Category[]>([]);
 	const [showRegistersList, setShowRegistersList] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
 	const [isAuthenticated, setIsAuthenticated] = useState(true);
@@ -20,7 +24,17 @@ const RegistersPage: React.FC = () => {
 	const [message, setMessage] = useState('');
 	const [haveError, setHaveError] = useState(false);
 	const [modalKey, setModalKey] = useState<number>(0);
-	const [shouldReloadData, setShouldReloadData] = useState(false);
+	const [filterValues, setFilterValues] = useState({
+		startDate: '',
+		endDate: '',
+		selectedYearStart: '',
+		selectedMonthStart: '',
+		selectedYearEnd: '',
+		selectedMonthEnd: '',
+		nameFilter: '',
+		typeFilter: '',
+		categoryFilter: 0,
+	});
 
 	const sessionExpired = () => {
 		setHaveError(true)
@@ -33,32 +47,18 @@ const RegistersPage: React.FC = () => {
 		return;
 	}
 
-	const fetchRegisters = async (startDate?: string | null, endDate?: string | null) => {
-		console.log(`fetchRegisters`)
+	const fetchRegisters = async (
+		startDate?: string | null,
+		endDate?: string | null,
+		name?: string | null,
+		type?: string | null,
+		categoryId?: number | null,
+	) => {
 		setIsLoading(true);
 		const isValid = await validToken(token);
 
 		if (isValid) {
-
-			requestRegisters(startDate, endDate)
-			// try {
-			// 	const data = await getRegisters(token, startDate, endDate)
-			// 	setRegisters(data);
-			// 	setShowRegistersList(true);
-			// } catch (error: any) {
-			// 	console.error(error);
-			// 	if (error.status == 401) {
-			// 		sessionExpired();
-			// 	} else {
-			// 		setHaveError(true);
-			// 		setMessage(`Error: ${error}`)
-			// 	}
-			// 	setTimeout(() => {
-			// 		setMessage('');
-			// 	}, 1500);
-			// } finally {
-			// 	setIsLoading(false);
-			// }
+			requestRegisters(startDate, endDate, name, type, categoryId)
 		}
 		else {
 			sessionExpired();
@@ -66,37 +66,72 @@ const RegistersPage: React.FC = () => {
 
 	};
 
+	const fetchCategories = async () => {
+		setIsLoading(true);
+		try {
+			const data = await getCategories(token)
+			setCategories(data);
+		} catch (error) {
+			handleErrorSetting(error)
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
 	useEffect(() => {
-		fetchRegisters()
+		fetchRegisters(filterValues.startDate, filterValues.endDate, filterValues.nameFilter, filterValues.typeFilter, filterValues.categoryFilter);
+		fetchCategories()
 	}, [router]);
 
 
 	const requestRegisters = async (
 		startDate?: string | null,
-		endDate?: string | null
+		endDate?: string | null,
+		name?: string | null,
+		type?: string | null,
+		categoryId?: number | null,
 	) => {
 		try {
-			const data = await getRegisters(token, startDate, endDate)
+			const data = await getRegisters(token, startDate, endDate, name, type, categoryId);
 			setRegisters(data);
 			setShowRegistersList(true);
-		} catch (error: any) {
-			console.error(error);
-			if (error.status == 401) {
-				sessionExpired();
-			} else {
-				setHaveError(true);
-				setMessage(`Error: ${error}`)
-			}
-			setTimeout(() => {
-				setMessage('');
-			}, 1500);
+		} catch (error) {
+			handleErrorSetting(error)
 		} finally {
 			setIsLoading(false);
 		}
 	}
-	const handleFilter = (startDate: string | null, endDate: string | null) => {
-		console.log(`(handleFilter) startDate: ${startDate} - endDate: ${endDate}`)
-		requestRegisters(startDate, endDate);
+	const handleFilter = (
+		yearStart: string,
+		monthStart: string,
+		yearEnd: string,
+		monthEnd: string,
+		name: string,
+		type: string,
+		categoryId: number,
+	) => {
+		setIsLoading(true);
+		const startDate = `${yearStart}-${monthStart}-01`;
+		const lastDay = lastDayOfMonth(parseInt(yearEnd, 10), parseInt(monthEnd, 10));
+		const endDate = `${yearEnd}-${monthEnd}-${lastDay}`;
+		requestRegisters(startDate, endDate, name, type, categoryId);
+		setFilterValues({
+			startDate: startDate,
+			endDate: endDate,
+			selectedYearStart: yearStart,
+			selectedMonthStart: monthStart,
+			selectedYearEnd: yearEnd,
+			selectedMonthEnd: monthEnd,
+			nameFilter: name,
+			typeFilter: type,
+			categoryFilter: categoryId,
+		})
+	};
+
+	const lastDayOfMonth = (year: number, month: number) => {
+		const nextMonth = new Date(year, month + 1, 0);
+		const lastDay = nextMonth.getDate();
+		return lastDay;
 	};
 
 	const handleEdit = (id: number) => {
@@ -106,7 +141,6 @@ const RegistersPage: React.FC = () => {
 	};
 
 	const handleDelete = async (id: number) => {
-
 		setIsLoading(true);
 		deleteRegister(id, token)
 			.then(() => {
@@ -118,22 +152,11 @@ const RegistersPage: React.FC = () => {
 				}, 1500);
 			})
 			.catch((error) => {
-				console.error(error);
-				if (error.status == 401) {
-					sessionExpired();
-				} else {
-					setHaveError(true);
-					setMessage(`Error: ${error}`)
-				}
-				setTimeout(() => {
-					setMessage('');
-				}, 1500);
+				handleErrorSetting(error)
 			})
 			.finally(() => {
 				setIsLoading(false);
 			})
-
-
 	};
 
 	const handleOpenModal = () => {
@@ -142,27 +165,36 @@ const RegistersPage: React.FC = () => {
 		setIsModalOpen(true);
 	};
 
-	// const handleCloseModal = () => {
-	// 	setIsModalOpen(false);
-	// 	setModalKey((prevKey) => prevKey + 1);
-	// 	fetchRegisters();
-	// };
+	const handleCloseModal = () => {
+		setIsModalOpen(false);
+		setModalKey((prevKey) => prevKey + 1);
+		fetchRegisters(filterValues.startDate, filterValues.endDate, filterValues.nameFilter, filterValues.typeFilter, filterValues.categoryFilter);
+	};
 
-	// const handleSessionExpired = () => {
-	// 	sessionExpired()
-	// };
+	const handleSessionExpired = () => {
+		sessionExpired()
+	};
 
-	// const handleMessageAlert = (haveError: boolean, message: string | null) => {
-	// 	setHaveError(haveError);
-	// 	setMessage(`${message}`)
-	// 	setTimeout(() => {
-	// 		setMessage('');
-	// 	}, 1500);
-	// };
+	const handleMessageAlert = (haveError: boolean, message: string | null) => {
+		setHaveError(haveError);
+		setMessage(`${message}`)
+		setTimeout(() => {
+			setMessage('');
+		}, 1500);
+	};
 
-	// const handleReloadData = () => {
-	// 	setShouldReloadData(true);
-	// };
+	const handleErrorSetting = (error: any) => {
+		console.error(error);
+		if (error.status === 401) {
+			sessionExpired()
+		} else {
+			setHaveError(true)
+			setMessage(`Error: ${error.message}`)
+		}
+		setTimeout(() => {
+			setMessage('')
+		}, 1500);
+	}
 
 	return (
 		<div>
@@ -183,18 +215,25 @@ const RegistersPage: React.FC = () => {
 							</div>
 							{showRegistersList ? (
 
-								<RegistersList registers={registers} onEditRegister={handleEdit} onDeleteRegister={handleDelete} onFilterByDate={handleFilter} />
+								<RegistersList
+									registers={registers}
+									categories={categories}
+									onEditRegister={handleEdit}
+									onDeleteRegister={handleDelete}
+									onFilter={handleFilter}
+									filters={filterValues}
+								/>
 							) : (
-								// <RegisterForm
-								// 	isModalOpen={isModalOpen}
-								// 	onCloseModal={handleCloseModal}
-								// 	key={modalKey}
-								// 	selectedId={selectedRegisterId}
-								// 	isEditing={!!selectedRegisterId}
-								// 	onMessage={handleMessageAlert}
-								// 	sessionValid={handleSessionExpired}
-								// />
-								<></>
+								<RegisterForm
+									isModalOpen={isModalOpen}
+									onCloseModal={handleCloseModal}
+									key={modalKey}
+									selectedId={selectedRegisterId}
+									isEditing={!!selectedRegisterId}
+									onMessage={handleMessageAlert}
+									sessionValid={handleSessionExpired}
+									categories={categories}
+								/>
 							)}
 						</>
 					)}

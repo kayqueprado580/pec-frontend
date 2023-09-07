@@ -9,3 +9,15 @@ export interface Register {
 	description: string;
 	userId: number;
 }
+
+export interface FiltersRegisters {
+	startDate: string
+	endDate: string
+	selectedYearStart: string
+	selectedMonthStart: string
+	selectedYearEnd: string
+	selectedMonthEnd: string
+	nameFilter: string
+	typeFilter: string
+	categoryFilter: number
+}
