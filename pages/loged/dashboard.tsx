@@ -10,7 +10,6 @@ import { getDataDashboard } from "../api/dashboard";
 import DateFilter from "../components/loged/dashboard/dateFilterComponent";
 import Card from "../components/loged/dashboard/cardComponent";
 import Report from "../components/loged/dashboard/reportComponent";
-import PieChart from "../components/loged/dashboard/pieComponent";
 
 const DashboardPage: React.FC = () => {
 	const router = useRouter();
@@ -30,6 +29,7 @@ const DashboardPage: React.FC = () => {
 		selectedYearEnd: '',
 		selectedMonthEnd: ''
 	});
+	const [selectedChartType, setSelectedChartType] = useState<'pie' | 'bar'>('bar');
 
 	const sessionExpired = () => {
 		setIsAuthenticated(false)
@@ -123,27 +123,50 @@ const DashboardPage: React.FC = () => {
 									<h2 className="pt-12 text-2xl font-bold mb-4 text-center">Sem dados no momento...</h2>
 								</>
 							) : (
-								<div className="grid grid-cols-4 gap-4">
-									<div>
-										<Card title="Total de Receitas" value={dashboardData.dashboard.total.revenue} borderColor="#15df15" />
+								<>
+									<div className="grid grid-cols-4 gap-4">
+										<div>
+											<Card title="Total de Receitas" value={dashboardData.dashboard.total.revenue} borderColor="#15df15" />
+										</div>
+										<div>
+											<Card title="Total de Despesas" value={dashboardData.dashboard.total.expense} borderColor="#F71212" />
+										</div>
+										<div>
+											<Card title="Saldo" value={dashboardData.dashboard.total.balance} borderColor="#1288f7" />
+										</div>
+										<div>
+											<Card
+												title="Balanço"
+												value={dashboardData?.dashboard.total.positiveBalance ? 'Positivo' : 'Negativo'}
+												borderColor={dashboardData.dashboard.total.positiveBalance ? '#15df15' : '#F71212'}
+											/>
+										</div>
 									</div>
-									<div>
-										<Card title="Total de Despesas" value={dashboardData.dashboard.total.expense} borderColor="#F71212" />
+									<div className="flex justify-end mb-4 mr-4 items-center">
+										<label className="mr-2">Gráficos:</label>
+										<select
+											value={selectedChartType}
+											onChange={(e) => setSelectedChartType(e.target.value as 'pie' | 'bar')}
+											className="border rounded-lg px-2 py-1 dark:text-white"
+										>
+											<option value="pie">Pizza</option>
+											<option value="bar">Barras</option>
+										</select>
 									</div>
-									<div>
-										<Card title="Saldo" value={dashboardData.dashboard.total.balance} borderColor="#1288f7" />
+									<div className="grid grid-cols-2 gap-4">
+										{selectedChartType === 'pie' ? (
+											<>
+												<Report report={dashboardData.report} chartType="pie" isRevenue={true} />
+												<Report report={dashboardData.report} chartType="pie" isRevenue={false} />
+											</>
+										) : (
+											<>
+												<Report report={dashboardData.report} chartType="bar" isRevenue={true} />
+												<Report report={dashboardData.report} chartType="bar" isRevenue={false} />
+											</>
+										)}
 									</div>
-									<div>
-										<Card
-											title="Balanço"
-											value={dashboardData?.dashboard.total.positiveBalance ? 'Positivo' : 'Negativo'}
-											borderColor={dashboardData.dashboard.total.positiveBalance ? '#15df15' : '#F71212'}
-										/>
-										<PieChart data={dashboardData.report}/>
-										{/* <Report report={dashboardData.report} chartType="pie" /> */}
-										{/* <Report report={dashboardData.report} chartType="bar" /> */}
-									</div>
-								</div>
+								</>
 							)}
 						</>
 					) : (<></>)}

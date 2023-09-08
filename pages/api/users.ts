@@ -17,13 +17,30 @@ export const getUser = async (id: number, token: string | null) => {
 	}
 };
 
-export const editUser = async (id: number, token: string | null, name: string, description: string) => {
+export const getUserId = async (token: string | null) => {
+	try {
+		const response = await axios.get(`${apiUrl}/v1/categories?take=1`, {
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+		});
+
+		return response.data[0].userId;
+	} catch (error) {
+		console.error('Erro ao obter os dados:', error);
+		throw error;
+	}
+};
+
+export const editUser = async (token: string | null, id: number, name: string, email: string, username: string, password: string) => {
 	try {
 		const response = await axios.patch(
 			`${apiUrl}/v1/users/${id}`,
 			{
 				name,
-				description
+				email,
+				username,
+				password
 			},
 			{
 				headers: {

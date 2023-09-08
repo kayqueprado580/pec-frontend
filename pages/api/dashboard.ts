@@ -8,9 +8,9 @@ export const getDataDashboard = async (
 	endDate?: string | null,
 ) => {
 
-	let endpoint = `${apiUrl}/v1/dashboard?`
+	let endpoint = `${apiUrl}/v1/dashboard`
 	if (startDate && startDate != '')
-		endpoint += `startDate=${startDate}`
+		endpoint += `?startDate=${startDate}`
 
 	if (endDate && endDate != '')
 		endpoint += `&endDate=${endDate}`

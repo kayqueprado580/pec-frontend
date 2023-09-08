@@ -33,11 +33,11 @@ const Login: React.FC = () => {
         sessionStorage.setItem('accessToken', response.data.access_token);
         setToken(response.data.access_token);
         console.log('Login Sucess');
-        console.log('Token JWT:', response.data.access_token);
-        router.push('/loged/categories');
+        // console.log('Token JWT:', response.data.access_token);
+        router.push('/loged/dashboard');
       } else {
+        console.log('Login Failed');
         console.log('response:', response.data);
-        console.log('Login falhou');
         setError('Erro ao fazer login. Verifique suas credenciais.');
       }
     } catch (error) {
