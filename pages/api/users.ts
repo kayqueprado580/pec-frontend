@@ -32,15 +32,14 @@ export const getUserId = async (token: string | null) => {
 	}
 };
 
-export const editUser = async (token: string | null, id: number, name: string, email: string, username: string, password: string) => {
+export const editUser = async (token: string | null, id: number, name: string, email: string, username: string) => {
 	try {
 		const response = await axios.patch(
 			`${apiUrl}/v1/users/${id}`,
 			{
 				name,
 				email,
-				username,
-				password
+				username
 			},
 			{
 				headers: {
@@ -56,7 +55,7 @@ export const editUser = async (token: string | null, id: number, name: string, e
 	}
 };
 
-export const createUser = async (token: string | null, name: string, email: string, username: string, password: string) => {
+export const createUser = async (name: string, email: string, username: string, password: string) => {
 	try {
 		const response = await axios.post(
 			`${apiUrl}/v1/users`,
@@ -65,11 +64,6 @@ export const createUser = async (token: string | null, name: string, email: stri
 				email,
 				username,
 				password
-			},
-			{
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
 			}
 		);
 
@@ -97,3 +91,14 @@ export const validToken = async (token: string | null) => {
 	}
 	return false
 };
+
+interface LoginResponse {
+	access_token: string;
+}
+
+export const signIn = async (username: string, password: string) => {
+	return await axios.post<LoginResponse>(`${apiUrl}/v1/login`, {
+		username,
+		password,
+	});
+} 

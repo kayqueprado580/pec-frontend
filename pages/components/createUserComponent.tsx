@@ -1,12 +1,13 @@
 import { useState, ChangeEvent, FormEvent } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import { useRouter } from 'next/router';
+import { useAuth } from '../contexts/authContext';
 
 import Loading from './loadingComponent';
 import Alert from './messageAlertComponent';
 import { isValidEmail, isValidPassword, isValidString } from '../services/inputs.validator';
-import { createUser } from '../api/users';
-import { useRouter } from 'next/router';
+import { createUser, signIn } from '../api/users';
 
 const CreateFormUser: React.FC = () => {
 	const router = useRouter();
@@ -23,6 +24,7 @@ const CreateFormUser: React.FC = () => {
 	const [email, setEmail] = useState<string>('');
 	const [emailError, setEmailError] = useState('');
 	const [isSubmitting, setIsSubmitting] = useState(false);
+	const { setToken } = useAuth();
 
 	const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
@@ -33,19 +35,19 @@ const CreateFormUser: React.FC = () => {
 			return;
 		}
 		try {
-			//To Do
-			//Retirar o token do backend dessa rota, assim não será necessário passar.
-			//Assim que criar o usuário, fazer o login aqui mesmo e mandar para tela meu-perfil
 			setIsLoading(true);
-			const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYW1lIjoia2F5cXVlNTgwIiwiaWF0IjoxNjk0MDcwNjUwLCJleHAiOjE2OTQwNzM2NTB9.UMP2AEMUNEfXhvm0jhPTIPnHW5ZOwK1MjHeWKps63iA";
-			await createUser(token, name, email, username, password)
+			await createUser(name, email, username, password)
 
 			setHaveError(false)
-			setMessage(`Bem-vindo: ${name}, seu usuário foi criado com sucesso!`)
+			setMessage(`Bem-vindo: ${name}, seu usuário foi criado com sucesso! Você será redirecionado...`)
 			setTimeout(() => {
-				router.push('/');
 				setMessage('')
-			}, 1500);
+			}, 2000);
+
+			router.push('/');
+			//To Do
+			//Assim que criar o usuário, fazer o login aqui mesmo e mandar para tela meu-perfil
+			// await handleLogin()
 
 		} catch (error: any) {
 			console.error(error);
@@ -64,6 +66,28 @@ const CreateFormUser: React.FC = () => {
 		} finally {
 			setIsLoading(false);
 			setIsSubmitting(false);
+		}
+	}
+
+	const handleLogin = async () => {
+		try {
+			const response = await signIn(username, password)
+			if (response.data.access_token) {
+				sessionStorage.setItem('accessToken', response.data.access_token);
+				setToken(response.data.access_token);
+				console.log('Login Sucess');
+				router.push('/loged/profile');
+			} else {
+				console.log('Login Failed');
+				console.log('response:', response.data);
+				setHaveError(true)
+				setMessage('Erro ao fazer login. Verifique suas credenciais.');
+			}
+		} catch (error) {
+			console.error('Erro ao fazer login:', error);
+			setMessage('Erro ao fazer login. Tente novamente mais tarde.');
+		} finally {
+			setIsLoading(false);
 		}
 	}
 

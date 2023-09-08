@@ -7,7 +7,7 @@ import { useAuth } from '../contexts/authContext';
 import Alert from '../components/messageAlertComponent';
 import Loading from '../components/loadingComponent';
 import Navbar from '../components/navbarComponent';
-import { getUser, getUserId, validToken } from '../api/users';
+import { editUser, getUser, getUserId, validToken } from '../api/users';
 
 const ProfilePage: React.FC = () => {
 
@@ -21,6 +21,7 @@ const ProfilePage: React.FC = () => {
   const [userId, setUserID] = useState(0);
 
   const sessionExpired = () => {
+    setIsLoading(false);
     setHaveError(true)
     setMessage(`Sessão expirada, você será redirecionado`)
     setIsAuthenticated(false)
@@ -31,7 +32,7 @@ const ProfilePage: React.FC = () => {
     return;
   }
 
-  const fetchUsers = async () => {
+  const fetchUser = async () => {
     setIsLoading(true);
     const isValid = await validToken(token);
 
@@ -46,24 +47,68 @@ const ProfilePage: React.FC = () => {
       setUser(data)
       setUserID(data.id)
     } catch (error) {
-      console.error(error);
-      setHaveError(true);
-      setMessage(`Error: ${error}`)
-      setTimeout(() => {
-        setMessage('');
-      }, 1500);
+      defaultError(error)
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleUpdateUser = (updatedUser: User) => {
-    // Implemente a lógica de atualização do usuário aqui
-    console.log('Usuário atualizado:', updatedUser);
+  const update = async (
+    id: number,
+    name: string,
+    email: string,
+    username: string
+  ) => {
+    try {
+      await editUser(token, id, name, email, username)
+      setHaveError(false);
+      setMessage('Ação realizada com sucesso')
+      setTimeout(() => {
+        setMessage('');
+      }, 1500);
+    } catch (error) {
+      defaultError(error)
+    } finally {
+      setIsLoading(false);
+
+      fetchUser()
+    }
+  }
+
+  const defaultError = (error: any) => {
+    if (!isNaN(error.response?.data)) {
+      const response = error.response.data;
+      if (response.status == 403) {
+        setHaveError(true)
+        setMessage(`Erro: ${response.status} - Mensagem: ${response.error}`)
+      }
+      if (response.status == 401 || error.status == 401) {
+        sessionExpired();
+      }
+    }
+    if (isNaN(error.response.data)) {
+      if (error.status == 401) {
+        sessionExpired();
+      } else {
+        setHaveError(true)
+        setMessage(`Erro Desconhecido - Mensagem: ${error}`)
+      }
+    }
+
+  }
+
+  const handleUpdateUser = async (updatedUser: User) => {
+    setIsLoading(true);
+    const isValid = await validToken(token);
+    if (!isValid) {
+      sessionExpired();
+      return;
+    }
+    await update(updatedUser.id, updatedUser.name, updatedUser.email, updatedUser.username)
   };
 
   useEffect(() => {
-    fetchUsers()
+    fetchUser()
   }, [router]);
 
   return (
@@ -77,7 +122,7 @@ const ProfilePage: React.FC = () => {
             <>
               {user ? (
                 <div className="container mx-auto mt-8">
-                  <UserProfileForm user={user} onUpdateUser={handleUpdateUser} />
+                  <UserProfileForm user={user} onUpdateUser={handleUpdateUser} disableBtn={isLoading} />
                 </div>
               ) : (<></>)}
             </>
