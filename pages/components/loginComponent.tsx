@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import Loading from './loadingComponent';
 import Alert from './messageAlertComponent';
-import { useAuth } from '../contexts/authContext';
+import { useAuth } from '../../contexts/authContext';
 
 interface LoginResponse {
   access_token: string;

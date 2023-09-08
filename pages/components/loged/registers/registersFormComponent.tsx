@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { createRegister, editRegister, getRegister, validToken } from '../../../api/registers';
 import Loading from '../../loadingComponent';
-import { useAuth } from '../../../contexts/authContext';
-import { isValidString } from '../../../services/inputs.validator';
+import { useAuth } from '../../../../contexts/authContext';
+import { isValidString } from '../../../../services/inputs.validator';
 import { formatValue } from '../../../../utils/inputMask';
 import { Category } from '../../../../interfaces/category.interface';
 

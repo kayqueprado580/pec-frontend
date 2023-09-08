@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { createCategory, editCategory, getCategory, validToken } from '../../../api/categories';
 import Loading from '../../../components/loadingComponent';
-import { useAuth } from '../../../contexts/authContext';
-import { isValidString } from '../../../services/inputs.validator';
+import { useAuth } from '../../../../contexts/authContext';
+import { isValidString } from '../../../../services/inputs.validator';
 
 
 interface FormProps {

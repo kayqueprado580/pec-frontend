@@ -3,7 +3,7 @@ import { GetServerSideProps } from 'next';
 import { User } from '../../interfaces/user.interface';
 import UserProfileForm from '../components/loged/profile/userFormComponent';
 import { useRouter } from 'next/router';
-import { useAuth } from '../contexts/authContext';
+import { useAuth } from '../../contexts/authContext';
 import Alert from '../components/messageAlertComponent';
 import Loading from '../components/loadingComponent';
 import Navbar from '../components/navbarComponent';

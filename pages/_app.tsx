@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import '../styles/globals.css'
 import '@fortawesome/fontawesome-free/css/all.min.css'
-import { AuthProvider } from './contexts/authContext'; // Importe o AuthProvider
+import { AuthProvider } from '../contexts/authContext'; // Importe o AuthProvider
 
 function MyApp({ Component, pageProps }: AppProps) {
 

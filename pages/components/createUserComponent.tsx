@@ -2,11 +2,11 @@ import { useState, ChangeEvent, FormEvent } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { useRouter } from 'next/router';
-import { useAuth } from '../contexts/authContext';
+import { useAuth } from '../../contexts/authContext';
 
 import Loading from './loadingComponent';
 import Alert from './messageAlertComponent';
-import { isValidEmail, isValidPassword, isValidString } from '../services/inputs.validator';
+import { isValidEmail, isValidPassword, isValidString } from '../../services/inputs.validator';
 import { createUser, signIn } from '../api/users';
 
 const CreateFormUser: React.FC = () => {

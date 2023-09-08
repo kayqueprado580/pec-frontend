@@ -2,7 +2,7 @@
 import { useState, ChangeEvent, FormEvent, useEffect } from 'react';
 
 import { User } from '../../../../interfaces/user.interface';
-import { isValidEmail, isValidString } from '../../../services/inputs.validator';
+import { isValidEmail, isValidString } from '../../../../services/inputs.validator';
 
 interface UserProfileFormProps {
 	user: User;

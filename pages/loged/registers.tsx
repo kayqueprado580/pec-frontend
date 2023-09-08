@@ -5,7 +5,7 @@ import Navbar from '../components/navbarComponent';
 import { Register } from '../../interfaces/register.interface';
 import { getRegisters, deleteRegister, validToken } from '../api/registers';
 import Alert from '../components/messageAlertComponent';
-import { useAuth } from '../contexts/authContext';
+import { useAuth } from '../../contexts/authContext';
 import RegistersList from '../components/loged/registers/registersListComponent';
 import { getCategories } from '../api/categories';
 import { Category } from '../../interfaces/category.interface';

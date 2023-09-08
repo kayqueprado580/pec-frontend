@@ -7,7 +7,7 @@ import { Category } from '../../interfaces/category.interface';
 import { getCategories, deleteCategory, validToken } from '../api/categories';
 import Alert from '../components/messageAlertComponent';
 import CategoryForm from '../components/loged/categories/categoriesFormComponent';
-import { useAuth } from '../contexts/authContext';
+import { useAuth } from '../../contexts/authContext';
 
 const CategoriesPage: React.FC = () => {
 	const router = useRouter();

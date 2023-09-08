@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Navbar from "../components/navbarComponent";
-import { useAuth } from "../contexts/authContext";
+import { useAuth } from "../../contexts/authContext";
 import { useRouter } from "next/router";
 import Loading from "../components/loadingComponent";
 import { validToken } from "../api/categories";
