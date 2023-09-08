@@ -14,6 +14,14 @@ const CategoriesList: React.FC<CategoriesListProps> = ({ categories, onEditCateg
 	const [skip, setSkip] = useState(0); // Número de itens para pular
 	const [nameFilter, setNameFilter] = useState(''); // Estado para o filtro de nome
 
+	if (!categories) {
+		return (
+			<div className="border-collapse">
+				<h2 className="pt-12 text-2xl font-bold mb-4 text-center">Sem dados no momento...</h2>
+			</div>
+		)
+	}
+	
 	const filteredCategories = categories.filter((category) =>
 		category.name.toLowerCase().includes(nameFilter.toLowerCase())
 	);
@@ -23,13 +31,6 @@ const CategoriesList: React.FC<CategoriesListProps> = ({ categories, onEditCateg
 		setSkip(newSkip);
 	};
 
-	if (!categories) {
-		return (
-			<div className="border-collapse">
-				<h2 className="pt-12 text-2xl font-bold mb-4 text-center">Sem dados no momento...</h2>
-			</div>
-		)
-	}
 
 	return (
 		<div className="border-collapse">

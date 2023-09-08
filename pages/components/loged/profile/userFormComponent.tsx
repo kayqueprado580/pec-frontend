@@ -11,13 +11,23 @@ interface UserProfileFormProps {
 }
 
 const UserProfileForm: React.FC<UserProfileFormProps> = ({ user, onUpdateUser, disableBtn }) => {
-	const [name, setName] = useState(user.name);
-	const [username, setUsername] = useState(user.username);
-	const [email, setEmail] = useState(user.email);
+	const [name, setName] = useState('');
+	const [username, setUsername] = useState('');
+	const [email, setEmail] = useState('');
 	const [usernameError, setUsernameError] = useState('');
 	const [nameError, setNameError] = useState('');
 	const [emailError, setEmailError] = useState('');
 	const [isSubmitting, setIsSubmitting] = useState(false);
+
+	useEffect(() => {
+		if (user) {
+			setName(user.name)
+			setEmail(user.email)
+			setUsername(user.username)
+			setIsSubmitting(disableBtn);
+		}
+	}, []);
+
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
@@ -85,84 +95,87 @@ const UserProfileForm: React.FC<UserProfileFormProps> = ({ user, onUpdateUser, d
 
 	}
 
-	useEffect(() => {
-		setName(user.name)
-		setEmail(user.email)
-		setUsername(user.username)
-		setIsSubmitting(disableBtn);
-	}, []);
-
 	return (
 		<>
-			<form
-				onSubmit={handleSubmit}
-				className="grid gap-6 bg-white rounded-lg shadow-md mx-auto max-w-sm p-8"
-			>
-				<h1 className="text-lg font-semibold text-center">Ola, {user.name}</h1>
-				<div>
-					<label
-						htmlFor="name"
-						className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+
+			{!user ? (
+				<div className="border-collapse">
+					<h2 className="pt-12 text-2xl font-bold mb-4 text-center">Sem dados no momento...</h2>
+				</div>
+			) : (
+				<>
+					<form
+						onSubmit={handleSubmit}
+						className="grid gap-6 bg-white rounded-lg shadow-md mx-auto max-w-sm p-8"
 					>
-						Nome
-					</label>
-					<input
-						type="text"
-						id="name"
-						name="name"
-						value={name}
-						onChange={handleNameChange}
-						className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-						placeholder="Seu Nome"
-					/>
-					{nameError && <p className="text-red-500">{nameError}</p>}
-				</div>
+						<h1 className="text-lg font-semibold text-center">Ola, {user.name}</h1>
+						<div>
+							<label
+								htmlFor="name"
+								className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+							>
+								Nome
+							</label>
+							<input
+								type="text"
+								id="name"
+								name="name"
+								value={name}
+								onChange={handleNameChange}
+								className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+								placeholder="Seu Nome"
+							/>
+							{nameError && <p className="text-red-500">{nameError}</p>}
+						</div>
 
-				<div>
-					<label
-						htmlFor="email"
-						className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-					>
-						Email
-					</label>
-					<input
-						type="email"
-						id="email"
-						name="email"
-						value={email}
-						onChange={handleEmailChange}
-						className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-						placeholder="example@example.com"
-					/>
-					{emailError && <p className="text-red-500">{emailError}</p>}
-				</div>
+						<div>
+							<label
+								htmlFor="email"
+								className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+							>
+								Email
+							</label>
+							<input
+								type="email"
+								id="email"
+								name="email"
+								value={email}
+								onChange={handleEmailChange}
+								className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+								placeholder="example@example.com"
+							/>
+							{emailError && <p className="text-red-500">{emailError}</p>}
+						</div>
 
-				<div>
-					<label htmlFor="username" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-						Usuário
-					</label>
-					<input
-						type="text"
-						id="username"
-						value={username}
-						onChange={handleUsernameChange}
-						className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-						placeholder="user123@@"
-					/>
-					{usernameError && <p className="text-red-500">{usernameError}</p>}
-				</div>
+						<div>
+							<label htmlFor="username" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+								Usuário
+							</label>
+							<input
+								type="text"
+								id="username"
+								value={username}
+								onChange={handleUsernameChange}
+								className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+								placeholder="user123@@"
+							/>
+							{usernameError && <p className="text-red-500">{usernameError}</p>}
+						</div>
 
-				<div className="text-center">
-					<button
-						type="submit"
-						className="text-gray-800 bg-light-default-green hover:bg-default-green hover:text-white focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-						disabled={isSubmitting}
-					>
-						Salvar Alterações
-					</button>
-				</div>
+						<div className="text-center">
+							<button
+								type="submit"
+								className="text-gray-800 bg-light-default-green hover:bg-default-green hover:text-white focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+								disabled={isSubmitting}
+							>
+								Salvar Alterações
+							</button>
+						</div>
 
-			</form>
+					</form>
+				</>
+			)}
+
 		</>
 	);
 };

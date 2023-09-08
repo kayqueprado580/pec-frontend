@@ -13,6 +13,15 @@ interface ReportProps {
 
 const Report: React.FC<ReportProps> = ({ report, chartType, isRevenue }) => {
   let data = []
+
+  if (!report) {
+		return (
+			<div className="border-collapse">
+				<h2 className="pt-12 text-2xl font-bold mb-4 text-center">Sem dados no momento...</h2>
+			</div>
+		)
+	}
+
   if (isRevenue) {
     data = report.revenue.map((item) => ({
       name: item.categoryName,

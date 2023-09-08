@@ -83,6 +83,22 @@ const RegistersList: React.FC<RegistersListProps> = ({ registers, categories, on
 		setCategoryFilter(filters.categoryFilter);
 	}, [registers]);
 
+	if (!categories) {
+		return (
+			<div className="border-collapse">
+				<h2 className="pt-12 text-2xl font-bold mb-4 text-center">Por favor, criar categorias para utilizar em seus registros..</h2>
+			</div>
+		)
+	}
+
+	if (!registers) {
+		return (
+			<div className="border-collapse">
+				<h2 className="pt-12 text-2xl font-bold mb-4 text-center">Sem dados no momento...</h2>
+			</div>
+		)
+	}
+
 	const handlePageChange = (page: number) => {
 		const newSkip = (page - 1) * take;
 		setSkip(newSkip);
