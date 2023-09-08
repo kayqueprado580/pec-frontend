@@ -175,8 +175,8 @@ const RegistersPage: React.FC = () => {
 		sessionExpired()
 	};
 
-	const handleMessageAlert = (haveError: boolean, message: string | null) => {
-		setHaveError(haveError);
+	const handleMessageAlert = (haveError: boolean | null, message: string | null) => {
+		setHaveError(haveError ? true : false);
 		setMessage(`${message}`)
 		setTimeout(() => {
 			setMessage('');

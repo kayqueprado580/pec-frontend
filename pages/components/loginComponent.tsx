@@ -95,7 +95,7 @@ const Login: React.FC = () => {
               TO DO
               - fazer uma rota para esqueci a senha.
             */}
-            <a href='/' target='blank'><h3 className="mt-4 block text-sm font-light text-gray-900 dark:text-white">esqueci a senha!</h3></a>
+            <Link href='/' target='blank'><h3 className="mt-4 block text-sm font-light text-gray-900 dark:text-white">esqueci a senha!</h3></Link>
           </div>
 
           <div className="flex space-x-4">
@@ -103,16 +103,12 @@ const Login: React.FC = () => {
               <Loading />
             ) : (
               <>
-                {/*
-              TO DO
-              - fazer rota de cadastro usuário novo.
-                */}
-                <a
+                <Link
                   href="/create-user"
                   className="text-gray-800 bg-light-default-green hover:bg-default-green hover:text-white focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                 >
                   Cadastrar
-                </a>
+                </Link>
 
                 <button
                   type="submit"

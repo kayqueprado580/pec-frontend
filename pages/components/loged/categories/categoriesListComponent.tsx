@@ -10,14 +10,6 @@ interface CategoriesListProps {
 
 const CategoriesList: React.FC<CategoriesListProps> = ({ categories, onEditCategory, onDeleteCategory }) => {
 
-	if (!categories) {
-		return (
-			<div className="border-collapse">
-				<h2 className="pt-12 text-2xl font-bold mb-4 text-center">Sem dados no momento...</h2>
-			</div>
-		)
-	}
-
 	const [take, setTake] = useState(10); // Número de itens por página
 	const [skip, setSkip] = useState(0); // Número de itens para pular
 	const [nameFilter, setNameFilter] = useState(''); // Estado para o filtro de nome
@@ -30,6 +22,14 @@ const CategoriesList: React.FC<CategoriesListProps> = ({ categories, onEditCateg
 		const newSkip = (page - 1) * take;
 		setSkip(newSkip);
 	};
+
+	if (!categories) {
+		return (
+			<div className="border-collapse">
+				<h2 className="pt-12 text-2xl font-bold mb-4 text-center">Sem dados no momento...</h2>
+			</div>
+		)
+	}
 
 	return (
 		<div className="border-collapse">
