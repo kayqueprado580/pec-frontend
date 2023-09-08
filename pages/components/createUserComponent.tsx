@@ -42,9 +42,9 @@ const CreateFormUser: React.FC = () => {
 			setMessage(`Bem-vindo: ${name}, seu usuário foi criado com sucesso! Você será redirecionado...`)
 			setTimeout(() => {
 				setMessage('')
+				router.push('/');
 			}, 2000);
 
-			router.push('/');
 			//To Do
 			//Assim que criar o usuário, fazer o login aqui mesmo e mandar para tela meu-perfil
 			// await handleLogin()
