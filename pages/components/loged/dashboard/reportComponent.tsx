@@ -1,6 +1,6 @@
 import React from 'react';
 import { PieChart, Pie, BarChart, Bar, Cell, Tooltip, Legend, ResponsiveContainer, XAxis, YAxis } from 'recharts';
-import { getRandomColors } from '../../../../utils/reportUtils';
+import { formatCurrency, getRandomColors } from '../../../../utils/reportUtils';
 
 interface ReportProps {
   report: {
@@ -36,7 +36,7 @@ const Report: React.FC<ReportProps> = ({ report, chartType, isRevenue }) => {
                 <Cell key={`cell-${index}`} fill={getRandomColors(data.length)[index]} />
               ))}
             </Pie>
-            <Tooltip />
+            <Tooltip formatter={(value: number) => formatCurrency(value)} />
             <Legend />
           </PieChart>
         ) : (
@@ -47,8 +47,8 @@ const Report: React.FC<ReportProps> = ({ report, chartType, isRevenue }) => {
               ))}
             </Bar>
             <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip />
+            <YAxis tickFormatter={(value: number) => formatCurrency(value)} />
+            <Tooltip formatter={(value: number) => formatCurrency(value)} />
             <Legend />
           </BarChart>
         )}
